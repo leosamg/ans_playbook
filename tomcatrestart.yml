@@ -3,9 +3,9 @@
    hosts: all
    
    vars:
-    tomcat_folder: apache-tomcat-8.5.85
-    tomcat_path: "/appl/{{ tomcat_folder }}"
-    grep_string: "[/]appl/{{ tomcat_folder }}"
+    #tomcat_folder: apache-tomcat-8.5.85
+    #tomcat_path: "/appl/{{ tomcat_folder }}"
+    #grep_string: "[/]appl/{{ tomcat_folder }}"
     
    tasks:
    
