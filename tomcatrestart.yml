@@ -33,8 +33,4 @@
 
     - name: ==> startup tomcat , path = {{ tomcat_path }}/bin/startup.sh
       shell: setsid /bin/sh -i -c "{{ tomcat_path }}/bin/startup.sh"
-
-   
-#    - name: Start Tomcat
-#      shell: "/appl/apache-tomcat-8.5.85/bin/startup.sh"
 ...
