@@ -1,0 +1,104 @@
+---
+- name: Provisioning a Virtual Machine on VMware from an existing template.
+  hosts: localhost
+  gather_facts: no
+  
+  collections:
+    - community.vmware
+
+  vars_prompt:
+
+   - name: "vc_username"
+     prompt: "SCC Vcenter username"
+     private: no
+
+   - name: "vc_password"
+     prompt: "SCC Vcenter Password"
+     private: yes
+   
+   - name: "vm_templ"
+     prompt: "Which OS you need? (Template RHEL 8.5 Minimal)"
+     private: no
+
+   - name: "vm_name"
+     prompt: "Name of the virtual machine"
+     private: no
+
+   - name: "vm_ip"
+     prompt: "Virtual Machine IP Address"
+     private: no
+
+   - name: "vm_smask"
+     prompt: "Subnetmask for Virtual Machine"
+     private: no
+
+   - name: "vm_gw"
+     prompt: "Gateway of the Virtual Machine"
+     private: no
+
+   - name: "net_name"
+     prompt: "Port Group Name, VLAN, Network Name"
+     private: no
+
+   - name: "vm_memory"
+     prompt: "Memory size"
+     private: no
+   
+   - name: "vm_cpu"
+     prompt: "CPU Core"
+     private: no
+
+  vars:
+    vc_name: "SCCVCENTER01.YCH.COM"
+    vc_user: "{{ vc_username }}"
+    vc_pass: "{{ vc_password }}"
+    dc: "SCC_DATACENTER"
+    cls: "SG-SCC-UAT" 
+    datast: "DEVAPDATASTORE02"
+    #disk_size: 100
+    #vm_dns: 192.168.0.21
+    notes: This VM Provisioned using ansible.
+    corepersock: "{{ vm_cpu | int /2 }}"
+    cpulimit: "{{ vm_cpu | int *1000 }}"
+  tasks:
+    - name: Clone the {{ vm_templ }} Virtual machine from an existing template.
+      vmware_guest:
+        validate_certs: False
+        hostname: "{{ vc_name }}"
+        username: "{{ vc_user }}"
+        password: "{{ vc_pass }}"
+        cluster: "{{ cls }}"
+        datacenter: "{{ dc }}"
+        folder: "/{{ dc }}/vm"
+        name: "{{ vm_name }}"
+        template: "{{ vm_templ }}"
+        #disk:
+        #  - size_gb: 100
+        #    type: thin
+        #    datastore: "{{ datast }}"
+        networks:
+        - name: "{{ net_name }}"
+          type: static
+          #device_type: vmxnet3
+          ip: "{{ vm_ip }}"
+          netmask: "{{ vm_smask }}"
+          gateway: "{{ vm_gw }}"
+          #dns_servers: "{{ vm_dns }}"
+        hardware:
+          memory_gb: "{{ vm_memory }}"
+          num_cpus: "{{ vm_cpu }}"
+          num_cpu_cores_per_socket: "{{ corepersock | int }}"
+          cpu_limit:  "{{ cpulimit | int }}"
+        wait_for_ip_address: true
+        customization:
+          domain: ych.com
+          dns_servers:
+          - 10.202.16.100
+          - 10.202.94.200
+          dns_suffix:
+          - ych.com
+        state: present
+      register: created_vm
+
+    - debug:
+         var: created_vm.instance.ipv4
