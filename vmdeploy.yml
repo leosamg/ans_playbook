@@ -5,49 +5,6 @@
   
   collections:
     - community.vmware
-
-  vars_prompt:
-
-   - name: "vc_username"
-     prompt: "SCC Vcenter username"
-     private: no
-
-   - name: "vc_password"
-     prompt: "SCC Vcenter Password"
-     private: yes
-   
-   - name: "vm_templ"
-     prompt: "Which OS you need? (Template RHEL 8.5 Minimal)"
-     private: no
-
-   - name: "vm_name"
-     prompt: "Name of the virtual machine"
-     private: no
-
-   - name: "vm_ip"
-     prompt: "Virtual Machine IP Address"
-     private: no
-
-   - name: "vm_smask"
-     prompt: "Subnetmask for Virtual Machine"
-     private: no
-
-   - name: "vm_gw"
-     prompt: "Gateway of the Virtual Machine"
-     private: no
-
-   - name: "net_name"
-     prompt: "Port Group Name, VLAN, Network Name"
-     private: no
-
-   - name: "vm_memory"
-     prompt: "Memory size"
-     private: no
-   
-   - name: "vm_cpu"
-     prompt: "CPU Core"
-     private: no
-
   vars:
     vc_name: "SCCVCENTER01.YCH.COM"
     vc_user: "{{ vc_username }}"
