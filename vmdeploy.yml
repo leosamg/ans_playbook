@@ -4,6 +4,8 @@
   gather_facts: no
   collections:
     - community.vmware
+  extra_vars:
+    vcenter_hostname
   
   tasks:
     - name: Deploy VM from template
