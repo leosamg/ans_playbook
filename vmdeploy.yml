@@ -1,61 +1,32 @@
 ---
-- name: Provisioning a Virtual Machine on VMware from an existing template.
-  hosts: localhost
+- name: Deploy a new VM from template
+  hosts: all
   gather_facts: no
-  
   collections:
     - community.vmware
-  vars:
-    vc_name: "SCCVCENTER01.YCH.COM"
-    vc_user: "{{ vc_username }}"
-    vc_pass: "{{ vc_password }}"
-    dc: "SCC_DATACENTER"
-    cls: "SG-SCC-UAT" 
-    datast: "DEVAPDATASTORE02"
-    #disk_size: 100
-    #vm_dns: 192.168.0.21
-    notes: This VM Provisioned using ansible.
-    corepersock: "{{ vm_cpu | int /2 }}"
-    cpulimit: "{{ vm_cpu | int *1000 }}"
+  
   tasks:
-    - name: Clone the {{ vm_templ }} Virtual machine from an existing template.
+    - name: Deploy VM from template
       vmware_guest:
-        validate_certs: False
-        hostname: "{{ vc_name }}"
-        username: "{{ vc_user }}"
-        password: "{{ vc_pass }}"
-        cluster: "{{ cls }}"
-        datacenter: "{{ dc }}"
-        folder: "/{{ dc }}/vm"
+        hostname: "{{ vcenter_hostname }}"
+        username: "{{ vcenter_username }}"
+        password: "{{ vcenter_password }}"
+        validate_certs: no
+        datacenter: "{{ datacenter_name }}"
+        cluster: "{{ cluster_name }}"
+        folder: "{{ vm_folder }}"
         name: "{{ vm_name }}"
-        template: "{{ vm_templ }}"
-        #disk:
-        #  - size_gb: 100
-        #    type: thin
-        #    datastore: "{{ datast }}"
+        template: "{{ template_name }}"
+        datastore: "{{ datastore_name }}"
         networks:
-        - name: "{{ net_name }}"
-          type: static
-          #device_type: vmxnet3
-          ip: "{{ vm_ip }}"
-          netmask: "{{ vm_smask }}"
-          gateway: "{{ vm_gw }}"
-          #dns_servers: "{{ vm_dns }}"
+          - name: "{{ network_name }}"
         hardware:
-          memory_gb: "{{ vm_memory }}"
-          num_cpus: "{{ vm_cpu }}"
-          num_cpu_cores_per_socket: "{{ corepersock | int }}"
-          cpu_limit:  "{{ cpulimit | int }}"
-        wait_for_ip_address: true
-        customization:
-          domain: ych.com
-          dns_servers:
-          - 10.202.16.100
-          - 10.202.94.200
-          dns_suffix:
-          - ych.com
-        state: present
-      register: created_vm
+          memory_mb: 4096
+          num_cpus: 2
+        wait_for_ip_address: no
+      delegate_to: localhost
+      register: deploy_result
 
-    - debug:
-         var: created_vm.instance.ipv4
+    - name: Display VM IP
+      debug:
+        msg: "The new VM's IP address is {{ deploy_result.instance.ipv4 }}"
