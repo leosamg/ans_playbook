@@ -6,7 +6,17 @@
     - community.vmware
   vars:
     vcenter_hostname: ""
-  
+    vcenter_username: ""
+    vcenter_username: ""
+    datacenter_name: ""
+    cluster_name: ""
+    template_name: ""
+    vm_name: ""
+    vm_folder: ""
+    datastore_name: ""
+    network_name: ""
+    resource_pool: ""
+    
   tasks:
     - name: Deploy VM from template
       vmware_guest:
